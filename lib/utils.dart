@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 // Local imports
 import 'package:fooocus/configs.dart';
@@ -48,23 +47,6 @@ Future<List<String>> fetchStyles() async {
   // Parse the response body as JSON
   final List<dynamic> data = jsonDecode(response.body);
   return data.cast<String>();
-}
-
-// Function to download images from the server and save them locally
-Future<void> saveImage(String url) async {
-  // Request storage permission
-  await Permission.manageExternalStorage.request();
-
-  // Download or fetch cached file
-  final file = await DefaultCacheManager().getSingleFile(url);
-
-  // Save to Pictures/Fooocus
-  final dir = Directory('/storage/emulated/0/Pictures/Fooocus');
-  if (!await dir.exists()) await dir.create(recursive: true);
-
-  final newPath =
-      '${dir.path}/image_${DateTime.now().millisecondsSinceEpoch}.png';
-  await File(file.path).copy(newPath);
 }
 
 // Function to save a FILE image to local storage
