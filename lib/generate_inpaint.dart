@@ -63,19 +63,23 @@ class InpaintImagePageState extends GeneratorBaseState {
       "cfg_scale": AppConfig.guidanceScale,
       "denoising_strength": AppConfig.denoiseStrength,
 
-  "init_images": [base64Image],
-  "mask": base64Mask,
-  "save_images": true,
-  "send_images": true,
+      "init_images": [base64Image],
+      "mask": base64Mask,
+      "save_images": true,
+      "send_images": true,
 
+      "scheduler": "karras",
 
-  "mask_blur": 4,  // Mask blur
-  "inpainting_fill": 3,  // 0 - Fill, 1 - Original, 2 - Latent Noise, 3 - Latent Nothing
-  "inpaint_full_res": true, // False - ???, True - Inpaint only masked
-  "inpaint_full_res_padding": 4,
-  "inpainting_mask_invert": 0,  // 0 - Inpaint masked, 1 - Inpaint unmasked
-  "mask_round": false,
-});
+      "mask_blur": 4, // Mask blur
+      "inpainting_fill": 3, // 0 - Fill, 1 - Original, 2 - Latent Noise, 3 - Latent Nothing
+      // "inpaint_full_res": true, // False - ???, True - Inpaint only masked
+      "inpaint_full_res_padding": 32,
+      "inpainting_mask_invert": 0, // 0 - Inpaint masked, 1 - Inpaint unmasked
+      "mask_round": false,
+
+      "resize_mode": 0,
+      "image_cfg_scale": 1.5,
+    });
     // Add the prompt to the history and avoid duplicates
     AppConfig.promptHistory.add(prompt);
     AppConfig.promptHistory = AppConfig.promptHistory.toSet().toList();
@@ -112,55 +116,41 @@ class InpaintImagePageState extends GeneratorBaseState {
 
   // Method to get the drawn mask
   Future<String?> _getMask() async {
-    // Get what's rendered in the repaint boundary
     RenderRepaintBoundary boundary =
         repaintBoundaryKey.currentContext!.findRenderObject()
             as RenderRepaintBoundary;
     ui.Image image = await boundary.toImage();
 
-    // Convert the image to raw RGBA data
     ByteData? byteData = await image.toByteData(
       format: ui.ImageByteFormat.rawRgba,
     );
     if (byteData == null) return null;
     Uint8List buffer = byteData.buffer.asUint8List();
 
-    // Convert the RGBA byte buffer into an Image from the 'image' package
     img.Image imgImage = img.Image.fromBytes(image.width, image.height, buffer);
 
-    // Create a binary mask by converting transparency into black and opaque areas into white
-    for (int y = 0; y < imgImage.height; y++) {
-      for (int x = 0; x < imgImage.width; x++) {
-        int pixel = imgImage.getPixel(x, y);
-        int alpha = img.getAlpha(pixel);
-
-        // If alpha is 0 (transparent), set pixel to black (mask area)
-        // Else set pixel to white (non-mask area)
-        if (alpha == 0) {
-          imgImage.setPixel(x, y, img.getColor(0, 0, 0)); // Black (for mask)
-        } else {
-          imgImage.setPixel(
-            x,
-            y,
-            img.getColor(255, 255, 255),
-          ); // White (for non-mask area)
-        }
-      }
-    }
-
-    // Resize if needed
+    // Resize first to avoid introducing gray pixels
     imgImage = img.copyResize(
       imgImage,
       width: _imageWidth.toInt(),
       height: _imageHeight.toInt(),
+      interpolation: img.Interpolation.nearest,
     );
 
-    // Encode the image to PNG format and convert it to base64 string
-    List<int> pngBytes = img.encodePng(imgImage);
+    // Then pure black or white
+    for (int i = 0; i < imgImage.length; i++) {
+      int pixel = imgImage[i];
+      int r = img.getRed(pixel);
+      int g = img.getGreen(pixel);
+      int b = img.getBlue(pixel);
 
-    return base64Encode(
-      pngBytes,
-    ); // Return the base64 encoded string of the mask
+      bool isBlack = (r == 0 && g == 0 && b == 0);
+      imgImage[i] =
+          isBlack ? img.getColor(0, 0, 0) : img.getColor(255, 255, 255);
+    }
+
+    List<int> pngBytes = img.encodePng(imgImage);
+    return base64Encode(pngBytes);
   }
 
   // ===== Helper Widgets =====
@@ -316,11 +306,7 @@ class DrawPoint {
   final bool isErase;
   final double width; // Default stroke width
 
-  DrawPoint({
-    required this.offset,
-    required this.isErase,
-    required this.width,
-  });
+  DrawPoint({required this.offset, required this.isErase, required this.width});
 }
 
 // CustomPainter to draw the mask
@@ -350,6 +336,7 @@ class MaskPainter extends CustomPainter {
         // Set the paint color based on the erase state
         paint
           ..strokeWidth = p1.width
+          ..isAntiAlias = false
           ..color = p1.isErase ? Colors.transparent : Colors.white
           ..blendMode = p1.isErase ? BlendMode.clear : BlendMode.srcOver;
 

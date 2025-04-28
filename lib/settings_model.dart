@@ -6,6 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 // Local imports
 import 'package:fooocus/configs.dart';
+import 'package:fooocus/utils.dart';
 
 // Models settings page
 class ModelsSettingsPage extends StatefulWidget {
@@ -62,7 +63,7 @@ class ModelsSettingsPageState extends State<ModelsSettingsPage> {
           itemBuilder: (context, index) {
             // Determine if this is the selected model
             bool isSelected = AppConfig.selectedModel == index;
-
+            
             return AnimatedContainer(
               duration: Duration(milliseconds: 300),
               curve: Curves.easeInOut,
@@ -88,6 +89,7 @@ class ModelsSettingsPageState extends State<ModelsSettingsPage> {
                 onTap: () {
                   setState(() {
                     AppConfig.selectedModel = index;
+                    setModel();
                   });
                 },
               ),

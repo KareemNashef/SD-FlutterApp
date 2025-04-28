@@ -127,6 +127,19 @@ Future<void> fetchModels() async {
   }
 }
 
+// Function to set model
+Future<void> setModel() async {
+  // Send a POST request to the server
+  print(AppConfig.modelTitles[AppConfig.selectedModel]);
+  await http.post(
+    Uri.parse(getOptionsUrl()),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "sd_model_checkpoint": AppConfig.modelTitles[AppConfig.selectedModel],
+    }),
+  );
+}
+
 // Function to fetch samplers from the server
 Future<void> fetchSamplers() async {
   // Fetch samplers from the server

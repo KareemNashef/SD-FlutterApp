@@ -71,7 +71,7 @@ class AppConfig {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // App UI configuration
-    seedColor.value = prefs.getString('seedColor') as Color;
+    // seedColor.value = Color(int.parse('0xff${prefs.getString('seedColor')!}'));
     
     // Server configuration
     ip = prefs.getString('ip') ?? '10.0.0.73';
@@ -81,7 +81,7 @@ class AppConfig {
     modelTitles = prefs.getStringList('modelTitles') ?? [];
     modelNames = prefs.getStringList('modelNames') ?? [];
     modelHashes = prefs.getStringList('modelHashes') ?? [];
-    //selectedModel = prefs.getInt('selectedModel') ?? 0;
+    selectedModel = prefs.getInt('selectedModel') ?? 0;
 
     // Generation configuration
     samplersNames = prefs.getStringList('samplersNames') ?? [];
