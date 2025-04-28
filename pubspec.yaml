@@ -18,6 +18,8 @@ dependencies:
   image_picker: ^1.1.2
   flutter_exif_rotation: ^0.5.2
   image: ^3.0.1
+  path_provider: ^2.0.11
+  flutter_staggered_grid_view: ^0.6.2
 
 
 dev_dependencies:
@@ -27,3 +29,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

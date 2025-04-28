@@ -33,7 +33,7 @@ class GeneratorBaseState extends State<GeneratorBase> {
   bool isShowingInputImage = true; // Flag to show input image
 
   // Progress variables
-  int jobProgress = 0; // Job progress percentage
+  double jobProgress = 0.0; // Job progress percentage
   String jobStatus = 'unknown'; // Job status
   bool isGenerating = false; // Flag to indicate if generation is in progress
   Timer? progressTimer; // Timer for progress updates
@@ -61,55 +61,92 @@ class GeneratorBaseState extends State<GeneratorBase> {
   }
 
   // Method to follow the progress of the job
-  Future<void> followJobProgress(String jobID) async {
+  Future<void> followJobProgress(url, headers, body) async {
     // Start the generation process
     setState(() {
       isGenerating = true;
     });
 
+    // Send the request
+    http
+        .post(url, headers: headers, body: body)
+        .then((generationResponse) async {
+          // Handle the response when it becomes available
+          if (generationResponse.statusCode == 200) {
+            try {
+              final generationData = jsonDecode(generationResponse.body);
+              final infoText = generationData['info'];
+              File logFile = File('/storage/emulated/0/Pictures/Fooocus/debug_output.txt');
+              await logFile.writeAsString(infoText, mode: FileMode.append);
+              List<String> base64Images = List<String>.from(
+                generationData['images'],
+              );
+
+              // Process the images
+              for (var base64Str in base64Images) {
+                final bytes = base64Decode(base64Str);
+                final tempDir = Directory.systemTemp;
+                final file = await File(
+                  '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.png',
+                ).writeAsBytes(bytes);
+                outputImages.add(file);
+              }
+
+              // Update UI after processing images
+              setState(() {
+                outputImageIndex = 0;
+                outputImage = outputImages[0];
+                isShowingInputImage = false;
+                isGenerating = false;
+              });
+            } catch (e) {
+              print('Error parsing response: $e');
+            }
+          } else {
+            print(
+              'Request failed with status: ${generationResponse.statusCode}.',
+            );
+          }
+        })
+        .catchError((e) {
+          print('Error during HTTP request: $e');
+          // Handle errors
+        });
+
     // Set the query URL for the job progress
-    final queryUrl = Uri.parse(
-      'http://${AppConfig.ip}:${AppConfig.port}/v1/generation/query-job?job_id=$jobID',
-    );
+    final queryUrl = Uri.parse(getProgressUrl());
 
     // Start the progress timer
-    progressTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    progressTimer = Timer.periodic(const Duration(milliseconds: 500), (
+      timer,
+    ) async {
       // Get a response from the server and decode it
       final response = await http.get(queryUrl);
       final data = jsonDecode(response.body);
 
       // Get the progress and status of the job
-      final progress = data['job_progress'] ?? 0;
-      final status = data['job_status'];
+      final progress = data['progress'] ?? 0;
+      final job = data['state']?['job'] ?? "";
+      final currentImageBase64 = data['current_image'];
 
       // Update sync values
       setState(() {
         jobProgress = progress;
-        jobStatus = status;
+
+        if (currentImageBase64 != null) {
+          final bytes = base64Decode(currentImageBase64);
+          final tempDir = Directory.systemTemp;
+          outputImage = File(
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.png',
+          )..writeAsBytesSync(bytes); // Save the image as a temporary file
+          isShowingInputImage = false;
+        }
       });
 
       // If the job is finished
-      if (jobStatus == 'Finished') {
+      if (job.isEmpty) {
         // Stop the timer
         progressTimer?.cancel();
-
-        // Get the output images URLs
-        List<String> outputImagesURLS =
-            (data['job_result'] as List)
-                .map<String>((e) => e['url'].toString())
-                .toList();
-
-        // Get the output images files
-        final images = await Future.wait(outputImagesURLS.map(urlToFile));
-
-        // Update sync values
-        setState(() {
-          outputImages = images;
-          outputImageIndex = 0;
-          outputImage = outputImages[0];
-          isShowingInputImage = false;
-          isGenerating = false;
-        });
       }
     });
   }
@@ -118,12 +155,9 @@ class GeneratorBaseState extends State<GeneratorBase> {
   Future<File> urlToFile(String url) async {
     // Get the image data from the URL
     final response = await http.get(
-  Uri.parse(url),
-  headers: {
-    'User-Agent': 'Mozilla/5.0',
-    'Accept': 'image/*',
-  },
-);
+      Uri.parse(url),
+      headers: {'User-Agent': 'Mozilla/5.0', 'Accept': 'image/*'},
+    );
     final bytes = response.bodyBytes;
 
     // Create a temporary file and write the bytes to it
@@ -343,7 +377,7 @@ class GeneratorBaseState extends State<GeneratorBase> {
   Widget progressBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: LinearProgressIndicator(value: jobProgress / 100),
+      child: LinearProgressIndicator(value: jobProgress / 1.0),
     );
   }
 

@@ -12,6 +12,7 @@ import 'dart:ui' as ui;
 import 'package:image/image.dart' as img;
 
 // Local imports
+import 'package:fooocus/utils.dart';
 import 'package:fooocus/generate_base.dart';
 import 'package:fooocus/configs.dart';
 
@@ -44,9 +45,7 @@ class _InpaintImagePageState extends GeneratorBaseState {
     if (inputImage == null) return;
 
     // URL for the image generation API
-    final url = Uri.parse(
-      'http://${AppConfig.ip}:${AppConfig.port}/v2/generation/image-inpaint-outpaint',
-    );
+    final url = Uri.parse(getImageToImageUrl());
 
     // Headers for the request
     final headers = {'Content-Type': 'application/json'};
@@ -59,33 +58,31 @@ class _InpaintImagePageState extends GeneratorBaseState {
     final body = jsonEncode({
       "prompt": prompt,
       "negative_prompt": AppConfig.negativePrompts,
-      "style_selections": AppConfig.selectedStyles,
-      "performance_selection": AppConfig.performanceSelection,
-      "image_number": AppConfig.imageNumber,
-      "sharpness": AppConfig.sharpness,
-      "guidance_scale": AppConfig.guidanceScale,
-      "base_model_name": AppConfig.selectedModel,
-      "refiner_model_name": AppConfig.selectedRefiner,
-      "refiner_switch": AppConfig.refinerStrength,
-      "async_process": true,
-      "input_image": base64Image,
-      "input_mask": base64Mask,
-    });
+      "sampler_name": AppConfig.selectedSampler,
+      "batch_size": AppConfig.imageNumber,
+      "steps": AppConfig.stepsNumber,
+      "cfg_scale": AppConfig.guidanceScale,
+      "denoising_strength": AppConfig.denoiseStrength,
 
+  "init_images": [base64Image],
+  "mask": base64Mask,
+  "save_images": true,
+  "send_images": true,
+
+
+  "mask_blur": 4,  // Mask blur
+  "inpainting_fill": 3,  // 0 - Fill, 1 - Original, 2 - Latent Noise, 3 - Latent Nothing
+  "inpaint_full_res": true, // False - ???, True - Inpaint only masked
+  "inpaint_full_res_padding": 4,
+  "inpainting_mask_invert": 0,  // 0 - Inpaint masked, 1 - Inpaint unmasked
+  "mask_round": false,
+});
     // Add the prompt to the history and avoid duplicates
     AppConfig.promptHistory.add(prompt);
     AppConfig.promptHistory = AppConfig.promptHistory.toSet().toList();
 
-    // Send the request
-    setState(() => isGenerating = true);
-    final response = await http.post(url, headers: headers, body: body);
-
-    // Extract job ID from response
-    final data = jsonDecode(response.body);
-    String jobID = data['job_id'];
-
     // Start progress tracking
-    await followJobProgress(jobID);
+    await followJobProgress(url, headers, body);
   }
 
   // Method to load an image from the gallery
@@ -132,16 +129,27 @@ class _InpaintImagePageState extends GeneratorBaseState {
     // Convert the RGBA byte buffer into an Image from the 'image' package
     img.Image imgImage = img.Image.fromBytes(image.width, image.height, buffer);
 
-    // Replace transparent pixels with black
+    // Create a binary mask by converting transparency into black and opaque areas into white
     for (int y = 0; y < imgImage.height; y++) {
       for (int x = 0; x < imgImage.width; x++) {
         int pixel = imgImage.getPixel(x, y);
-        if (img.getAlpha(pixel) == 0) {
-          imgImage.setPixel(x, y, img.getColor(0, 0, 0));
+        int alpha = img.getAlpha(pixel);
+
+        // If alpha is 0 (transparent), set pixel to black (mask area)
+        // Else set pixel to white (non-mask area)
+        if (alpha == 0) {
+          imgImage.setPixel(x, y, img.getColor(0, 0, 0)); // Black (for mask)
+        } else {
+          imgImage.setPixel(
+            x,
+            y,
+            img.getColor(255, 255, 255),
+          ); // White (for non-mask area)
         }
       }
     }
-    // Resize
+
+    // Resize if needed
     imgImage = img.copyResize(
       imgImage,
       width: _imageWidth.toInt(),
@@ -150,7 +158,10 @@ class _InpaintImagePageState extends GeneratorBaseState {
 
     // Encode the image to PNG format and convert it to base64 string
     List<int> pngBytes = img.encodePng(imgImage);
-    return base64Encode(pngBytes);
+
+    return base64Encode(
+      pngBytes,
+    ); // Return the base64 encoded string of the mask
   }
 
   // ===== Helper Widgets =====
@@ -265,7 +276,7 @@ class _InpaintImagePageState extends GeneratorBaseState {
         children: [
           // Image display area
           imageDrawingWidget(),
-          
+
           // Thumbnail display area
           if (outputImages.isNotEmpty) imageCarousel(),
 

@@ -47,14 +47,9 @@ class _OutpaintImagePageState extends GeneratorBaseState {
     final body = jsonEncode({
       "prompt": "",
       "negative_prompt": AppConfig.negativePrompts,
-      "style_selections": AppConfig.selectedStyles,
-      "performance_selection": AppConfig.performanceSelection,
       "image_number": AppConfig.imageNumber,
-      "sharpness": AppConfig.sharpness,
       "guidance_scale": AppConfig.guidanceScale,
       "base_model_name": AppConfig.selectedModel,
-      "refiner_model_name": AppConfig.selectedRefiner,
-      "refiner_switch": AppConfig.refinerStrength,
       "async_process": true,
       "input_image": base64Image,
       "outpaint_selections": outpaintSelections,
@@ -69,7 +64,7 @@ class _OutpaintImagePageState extends GeneratorBaseState {
     String jobID = data['job_id'];
 
     // Start progress tracking
-    await followJobProgress(jobID);
+    //await followJobProgress(jobID);
   }
 
   // Method to select an outpaint option

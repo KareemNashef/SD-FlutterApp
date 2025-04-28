@@ -32,12 +32,20 @@ class _MyAppState extends State<MyApp> {
     AppConfig.seedColor.addListener(() {
       setState(() {});
     });
+
+    // Listen for changes in the app theme and update the app theme
+    AppConfig.appTheme.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     // Dispose of the seed color listener
     AppConfig.seedColor.removeListener(() {});
+
+    // Dispose of the app theme listener
+    AppConfig.appTheme.removeListener(() {});
     super.dispose();
   }
 
@@ -62,7 +70,7 @@ class _MyAppState extends State<MyApp> {
       ),
 
       // Theme toggle
-      themeMode: AppConfig.appTheme,
+      themeMode: AppConfig.appTheme.value,
 
       // Home page of the app
       home: const MainPage(),

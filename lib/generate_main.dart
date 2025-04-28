@@ -23,7 +23,7 @@ class _GeneratePageState extends State<GeneratePage> {
   final List<Widget> _generatePages = [
     TextToImagePage(),
     ImageToImagePage(),
-    OutpaintImagePage(),
+    //OutpaintImagePage(),
     InpaintImagePage(),
   ];
 
@@ -31,7 +31,7 @@ class _GeneratePageState extends State<GeneratePage> {
   final List<String> _pageTitles = [
     'Text to Image',
     'Image to Image',
-    'Outpaint Image',
+    //'Outpaint Image',
     'Inpaint Image',
   ];
 
@@ -76,8 +76,8 @@ class _GeneratePageState extends State<GeneratePage> {
             // If no option is selected, show the list of options
             _selectedOptionIndex == -1
                 ? GridView.count(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
+                  crossAxisCount: 1,
+                  childAspectRatio: 2,
                   children: [
                     // Text to Image option
                     _buildOptionItem(Icons.text_fields, 'Text to Image', 0),
@@ -86,10 +86,10 @@ class _GeneratePageState extends State<GeneratePage> {
                     _buildOptionItem(Icons.sync_alt, 'Image to Image', 1),
 
                     // Outpaint Image option
-                    _buildOptionItem(Icons.expand, 'Outpaint Image', 2),
+                    //_buildOptionItem(Icons.expand, 'Outpaint Image', 2),
                     
                     // Inpaint Image option
-                    _buildOptionItem(Icons.brush, 'Inpaint Image', 3),
+                    _buildOptionItem(Icons.brush, 'Inpaint Image', 2),
 
                   ],
                 )

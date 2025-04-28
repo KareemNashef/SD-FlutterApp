@@ -1,95 +1,101 @@
 // Flutter imports
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Configuration class for the app
 class AppConfig {
 
-  // App configuration
-  static ValueNotifier<Color> seedColor = ValueNotifier(Colors.blue);
-  static ThemeMode appTheme = ThemeMode.system;
-  static List<String> promptHistory = [];
+  // App UI Configuration
+  static ValueNotifier<Color> seedColor = ValueNotifier(Colors.blue);   
+  static ValueNotifier<ThemeMode> appTheme = ValueNotifier(ThemeMode.system);
 
   // Server configuration
   static String ip = '10.0.0.73';
   static String port = '9090';
 
-  // Model and refiner configuration
-  static String selectedModel = 'None';
-  static String selectedRefiner = 'None';
-  static double refinerStrength = 0.5;
+  // Models Configuration
+  static List<String> modelTitles = [];
+  static List<String> modelNames = [];
+  static List<String> modelHashes = [];
+  static int selectedModel = 0;
+  static List<File> modelPreviews = []; // Not saved to SharedPreferences
 
-  // Image generation configuration
-  static List<String> selectedStyles = [];
-  static String performanceSelection = 'Quality';
+  // Generation Configuration
+  static List<String> samplersNames = [];
+  static String selectedSampler = 'DPM++ 2M SDE';
   static int imageNumber = 1;
-  static double sharpness = 3.0;
+  static int stepsNumber = 50;
   static double guidanceScale = 3;
+  static double denoiseStrength = 0.75;
 
-  // Default negative prompts
+  // Prompt Configuration
+  static List<String> promptHistory = [];
   static String negativePrompts = '';
 
-  // Save the configuration to a file
+  // ===== Methods =====
+
+  /// Save the configuration to SharedPreferences
   static Future<void> saveConfig() async {
-    
-    // Get the instance of SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // App configuration
+    // App UI configuration
     prefs.setString('seedColor', seedColor.value.value.toRadixString(16));
-    prefs.setString('appTheme', appTheme.toString());
-    prefs.setStringList('promptHistory', promptHistory);
-
+    
     // Server configuration
     prefs.setString('ip', ip);
     prefs.setString('port', port);
 
-    // Model and refiner configuration
-    prefs.setString('selectedModel', selectedModel);
-    prefs.setString('selectedRefiner', selectedRefiner);
-    prefs.setDouble('refinerStrength', refinerStrength);
+    // Models configuration
+    prefs.setStringList('modelTitles', modelTitles);
+    prefs.setStringList('modelNames', modelNames);
+    prefs.setStringList('modelHashes', modelHashes);
+    prefs.setInt('selectedModel', selectedModel);
 
-    // Image generation configuration
-    prefs.setStringList('selectedStyles', selectedStyles);
-    prefs.setString('performanceSelection', performanceSelection);
+    // Generation configuration
+    prefs.setStringList('samplersNames', samplersNames);
+    prefs.setString('selectedSampler', selectedSampler);
     prefs.setInt('imageNumber', imageNumber);
-    prefs.setDouble('sharpness', sharpness);
+    prefs.setInt('stepsNumber', stepsNumber);
     prefs.setDouble('guidanceScale', guidanceScale);
-
-    // Default negative prompts
-    prefs.setString('negativePrompts', negativePrompts);
+    prefs.setDouble('denoiseStrength', denoiseStrength);
     
+    // Prompt configuration
+    prefs.setStringList('promptHistory', promptHistory);
+    prefs.setString('negativePrompts', negativePrompts);
   }
 
-  // Load the configuration from a file
+  /// Load the configuration from SharedPreferences
   static Future<void> loadConfig() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // App configuration
+    // App UI configuration
     String? seedColorHex = prefs.getString('seedColor');
     if (seedColorHex != null) {
       seedColor.value = Color(int.parse(seedColorHex, radix: 16)).withOpacity(1.0);
     }
-    promptHistory = prefs.getStringList('promptHistory') ?? [];
     
     // Server configuration
     ip = prefs.getString('ip') ?? '10.0.0.73';
     port = prefs.getString('port') ?? '9090';
 
-    // Model and refiner configuration
-    selectedModel = prefs.getString('selectedModel') ?? 'None';
-    selectedRefiner = prefs.getString('selectedRefiner') ?? 'None';
-    refinerStrength = prefs.getDouble('refinerStrength') ?? 0.5;
+    // Models configuration
+    modelTitles = prefs.getStringList('modelTitles') ?? [];
+    modelNames = prefs.getStringList('modelNames') ?? [];
+    modelHashes = prefs.getStringList('modelHashes') ?? [];
+    //selectedModel = prefs.getInt('selectedModel') ?? 0;
 
-    // Image generation configuration
-    selectedStyles = prefs.getStringList('selectedStyles') ?? [];
-    performanceSelection = prefs.getString('performanceSelection') ?? 'Quality';
+    // Generation configuration
+    samplersNames = prefs.getStringList('samplersNames') ?? [];
+    selectedSampler = prefs.getString('selectedSampler') ?? 'DPM++ 2M SDE';
     imageNumber = prefs.getInt('imageNumber') ?? 1;
-    sharpness = prefs.getDouble('sharpness') ?? 3.0;
-    guidanceScale = prefs.getDouble('guidanceScale') ?? 3;
-
-    // Default negative prompts
+    stepsNumber = prefs.getInt('stepsNumber') ?? 50;
+    guidanceScale = prefs.getDouble('guidanceScale') ?? 3.0;
+    denoiseStrength = prefs.getDouble('denoiseStrength') ?? 0.75;
+    
+    // Prompt configuration
+    promptHistory = prefs.getStringList('promptHistory') ?? [];
     negativePrompts = prefs.getString('negativePrompts') ?? '';
-
   }
 }

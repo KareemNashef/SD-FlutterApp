@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 // Local imports
+import 'package:fooocus/utils.dart';
 import 'package:fooocus/generate_base.dart';
 import 'package:fooocus/configs.dart';
 
@@ -29,9 +30,7 @@ class _TextToImagePageState extends GeneratorBaseState {
   @override
   Future<void> generateImage(String prompt) async {
     // URL for the image generation API
-    final url = Uri.parse(
-      'http://${AppConfig.ip}:${AppConfig.port}/v2/generation/text-to-image-with-ip',
-    );
+    final url = Uri.parse(getTextToImageUrl());
 
     // Headers for the request
     final headers = {'Content-Type': 'application/json'};
@@ -40,32 +39,22 @@ class _TextToImagePageState extends GeneratorBaseState {
     final body = jsonEncode({
       "prompt": prompt,
       "negative_prompt": AppConfig.negativePrompts,
-      "style_selections": AppConfig.selectedStyles,
-      "performance_selection": AppConfig.performanceSelection,
-      "aspect_ratios_selection": '$imageWidth*$imageHeight',
-      "image_number": AppConfig.imageNumber,
-      "sharpness": AppConfig.sharpness,
-      "guidance_scale": AppConfig.guidanceScale,
-      "base_model_name": AppConfig.selectedModel,
-      "refiner_model_name": AppConfig.selectedRefiner,
-      "refiner_switch": AppConfig.refinerStrength,
-      "async_process": true,
+      "sampler_name": AppConfig.selectedSampler,
+      "batch_size": AppConfig.imageNumber,
+      "steps": AppConfig.stepsNumber,
+      "cfg_scale": AppConfig.guidanceScale,
+      "denoising_strength": AppConfig.denoiseStrength,
+
+      "width": imageWidth,
+      "height": imageHeight,
     });
 
     // Add the prompt to the history and avoid duplicates
     AppConfig.promptHistory.add(prompt);
     AppConfig.promptHistory = AppConfig.promptHistory.toSet().toList();
 
-    // Send the request
-    setState(() => isGenerating = true);
-    final response = await http.post(url, headers: headers, body: body);
-
-    // Extract job ID from response
-    final data = jsonDecode(response.body);
-    String jobID = data['job_id'];
-
     // Start progress tracking
-    await followJobProgress(jobID);
+    await followJobProgress(url, headers, body);
   }
 
   // ===== Helper Widgets =====
@@ -112,11 +101,13 @@ class _TextToImagePageState extends GeneratorBaseState {
     return Column(
       children: [
         // Image display area
-        imageWidget(),
-    
+        if (!isShowingInputImage) imageWidget(),
+
         // Thumbnail display area
         if (outputImages.isNotEmpty) imageCarousel(),
-    
+
+        Spacer(),
+
         // Download button and reset button
         if (!isShowingInputImage)
           Column(
@@ -129,13 +120,13 @@ class _TextToImagePageState extends GeneratorBaseState {
               SizedBox(height: 8),
             ],
           ),
-    
+
         // Ratio selection buttons
         if (isShowingInputImage) ratiosButtons(),
-    
+
         // Input field for prompt
         if (isShowingInputImage) inputField(),
-    
+
         // Progress indicator
         if (isGenerating) progressBar(),
       ],
