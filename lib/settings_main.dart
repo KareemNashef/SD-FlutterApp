@@ -123,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   // Save configuration button
-  Widget saveButton() {
+  Widget saveButton(context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
@@ -201,7 +201,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
 
         // Save configuration button
-        saveButton(),
+        saveButton(context),
       
       ],
     );

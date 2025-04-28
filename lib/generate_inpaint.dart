@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
@@ -20,14 +19,14 @@ class InpaintImagePage extends GeneratorBase {
   const InpaintImagePage({super.key});
 
   @override
-  _InpaintImagePageState createState() => _InpaintImagePageState();
+  InpaintImagePageState createState() => InpaintImagePageState();
 }
 
-class _InpaintImagePageState extends GeneratorBaseState {
+class InpaintImagePageState extends GeneratorBaseState {
   // ===== Class Variables =====
 
   // Drawing variables
-  List<_DrawPoint?> points = [];
+  List<DrawPoint?> points = [];
   bool isErasing = false;
   double strokeWidth = 10.0;
   GlobalKey repaintBoundaryKey = GlobalKey();
@@ -243,7 +242,7 @@ class _InpaintImagePageState extends GeneratorBaseState {
                           );
                           setState(() {
                             points.add(
-                              _DrawPoint(
+                              DrawPoint(
                                 offset: localPos,
                                 isErase: isErasing,
                                 width: strokeWidth,
@@ -254,7 +253,7 @@ class _InpaintImagePageState extends GeneratorBaseState {
                         onPanEnd: (_) => setState(() => points.add(null)),
                         child: CustomPaint(
                           size: Size.infinite, // Will fill the parent
-                          painter: _MaskPainter(points),
+                          painter: MaskPainter(points),
                         ),
                       ),
                     ),
@@ -291,7 +290,7 @@ class _InpaintImagePageState extends GeneratorBaseState {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    downloadButton(),
+                    downloadButton(context),
                     replaceInputImageButton(),
                     resetButton(),
                   ],
@@ -312,12 +311,12 @@ class _InpaintImagePageState extends GeneratorBaseState {
 }
 
 // Class to represent a point on the mask
-class _DrawPoint {
+class DrawPoint {
   final Offset offset;
   final bool isErase;
   final double width; // Default stroke width
 
-  _DrawPoint({
+  DrawPoint({
     required this.offset,
     required this.isErase,
     required this.width,
@@ -325,12 +324,12 @@ class _DrawPoint {
 }
 
 // CustomPainter to draw the mask
-class _MaskPainter extends CustomPainter {
+class MaskPainter extends CustomPainter {
   // List of points to draw
-  final List<_DrawPoint?> points;
+  final List<DrawPoint?> points;
 
   // Constructor
-  _MaskPainter(this.points);
+  MaskPainter(this.points);
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:fooocus/configs.dart';
 
 class GenerationSettingsPage extends StatefulWidget {
+  const GenerationSettingsPage({super.key});
+
   @override
-  _GenerationSettingsPageState createState() => _GenerationSettingsPageState();
+  GenerationSettingsPageState createState() => GenerationSettingsPageState();
 }
 
-class _GenerationSettingsPageState extends State<GenerationSettingsPage> {
+class GenerationSettingsPageState extends State<GenerationSettingsPage> {
   // ===== Class Variables =====
 
   // Text controllers

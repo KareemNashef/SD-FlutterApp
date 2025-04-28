@@ -41,7 +41,7 @@ class AppConfig {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // App UI configuration
-    prefs.setString('seedColor', seedColor.value.value.toRadixString(16));
+    prefs.setString('seedColor', seedColor.value.toString());
     
     // Server configuration
     prefs.setString('ip', ip);
@@ -71,10 +71,7 @@ class AppConfig {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // App UI configuration
-    String? seedColorHex = prefs.getString('seedColor');
-    if (seedColorHex != null) {
-      seedColor.value = Color(int.parse(seedColorHex, radix: 16)).withOpacity(1.0);
-    }
+    seedColor.value = prefs.getString('seedColor') as Color;
     
     // Server configuration
     ip = prefs.getString('ip') ?? '10.0.0.73';

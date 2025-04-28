@@ -2,11 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:fooocus/utils.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:async';
 
 // Local imports
-import 'package:fooocus/utils.dart';
 import 'package:fooocus/generate_base.dart';
 import 'package:fooocus/configs.dart';
 
@@ -14,10 +12,10 @@ class ImageToImagePage extends GeneratorBase {
   const ImageToImagePage({super.key});
 
   @override
-  _ImageToImagePageState createState() => _ImageToImagePageState();
+  ImageToImagePageState createState() => ImageToImagePageState();
 }
 
-class _ImageToImagePageState extends GeneratorBaseState {
+class ImageToImagePageState extends GeneratorBaseState {
   // ===== Class Variables =====
 
   // Generation variables
@@ -163,7 +161,7 @@ class _ImageToImagePageState extends GeneratorBaseState {
               SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [downloadButton(), resetButton()],
+                children: [downloadButton(context), resetButton()],
               ),
               SizedBox(height: 8),
             ],

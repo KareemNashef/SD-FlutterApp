@@ -1,7 +1,6 @@
 // Flutter imports
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:async';
 
 // Local imports
@@ -13,10 +12,10 @@ class TextToImagePage extends GeneratorBase {
   const TextToImagePage({super.key});
 
   @override
-  _TextToImagePageState createState() => _TextToImagePageState();
+  TextToImagePageState createState() => TextToImagePageState();
 }
 
-class _TextToImagePageState extends GeneratorBaseState {
+class TextToImagePageState extends GeneratorBaseState {
   // ===== Class Variables =====
 
   // Image settings
@@ -115,7 +114,7 @@ class _TextToImagePageState extends GeneratorBaseState {
               SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [downloadButton(), resetButton()],
+                children: [downloadButton(context), resetButton()],
               ),
               SizedBox(height: 8),
             ],

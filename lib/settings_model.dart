@@ -9,11 +9,13 @@ import 'package:fooocus/configs.dart';
 
 // Models settings page
 class ModelsSettingsPage extends StatefulWidget {
+  const ModelsSettingsPage({super.key});
+
   @override
-  _ModelsSettingsPageState createState() => _ModelsSettingsPageState();
+  ModelsSettingsPageState createState() => ModelsSettingsPageState();
 }
 
-class _ModelsSettingsPageState extends State<ModelsSettingsPage> {
+class ModelsSettingsPageState extends State<ModelsSettingsPage> {
   // Cache for image dimensions to prevent recalculation
   final Map<int, Size> _imageSizeCache = {};
 
@@ -30,7 +32,7 @@ class _ModelsSettingsPageState extends State<ModelsSettingsPage> {
   Future<void> _getImageSize(File imageFile, int index) async {
     if (_imageSizeCache.containsKey(index)) return;
 
-    final Completer<Size> completer = Completer();
+    // final Completer<Size> completer = Completer();
     final Image image = Image.file(imageFile);
     image.image
         .resolve(const ImageConfiguration())
@@ -72,8 +74,8 @@ class _ModelsSettingsPageState extends State<ModelsSettingsPage> {
                         isSelected
                             ? Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.1),
+                            ).colorScheme.primary.withValues(alpha: 0.2)
+                            : Colors.black.withValues(alpha: 0.1),
                     blurRadius: isSelected ? 8 : 4,
                     spreadRadius: isSelected ? 2 : 0,
                   ),
@@ -105,12 +107,12 @@ class ModelCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const ModelCard({
-    Key? key,
+    super.key,
     required this.index,
     required this.isSelected,
     required this.imageSizeCache,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

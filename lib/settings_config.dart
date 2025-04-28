@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 
 // Local imports
 import 'package:fooocus/configs.dart';
-import 'package:fooocus/utils.dart';
 
 class ServerSettingsPage extends StatefulWidget {
+  const ServerSettingsPage({super.key});
+
   @override
-  _ServerSettingsPageState createState() => _ServerSettingsPageState();
+  ServerSettingsPageState createState() => ServerSettingsPageState();
 }
 
-class _ServerSettingsPageState extends State<ServerSettingsPage> {
+class ServerSettingsPageState extends State<ServerSettingsPage> {
   // ===== Class Variables =====
 
   // Text controllers
@@ -34,7 +35,7 @@ class _ServerSettingsPageState extends State<ServerSettingsPage> {
   }
 
   // IP text field
-  Widget IPField() {
+  Widget ipField() {
     return Padding(
       padding: const EdgeInsetsDirectional.symmetric(horizontal: 16),
       child: TextField(
@@ -71,7 +72,7 @@ class _ServerSettingsPageState extends State<ServerSettingsPage> {
   }
 
   // Save configuration button
-  Widget saveButton() {
+  Widget saveButton(context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
@@ -111,13 +112,13 @@ class _ServerSettingsPageState extends State<ServerSettingsPage> {
 
             // IP Text Field
             SizedBox(height: 16),
-            IPField(),
+            ipField(),
             SizedBox(height: 16),
             portField(),
             SizedBox(height: 16),
 
             // Save button
-            saveButton(),
+            saveButton(context),
 
           ],
         ),

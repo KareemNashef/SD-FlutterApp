@@ -10,16 +10,16 @@ class ThemeSettingsPage extends StatelessWidget {
 
   // App theme selection bar
   Widget themeSelectionBar(context) {
-    double _size = 120;
-    double _sizePic = 100;
+    double size = 120;
+    double sizePic = 100;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         // Light Theme
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          width: _size, // Increased size for better interaction
-          height: _size,
+          width: size, // Increased size for better interaction
+          height: size,
           decoration: BoxDecoration(
             color:
                 AppConfig.appTheme.value == ThemeMode.light
@@ -42,8 +42,8 @@ class ThemeSettingsPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   'assets/light_mode.png',
-                  width: _sizePic,
-                  height: _sizePic,
+                  width: sizePic,
+                  height: sizePic,
                 ),
               ),
 
@@ -57,7 +57,7 @@ class ThemeSettingsPage extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.black.withOpacity(0.5), // Blurry background
+                    color: Colors.black.withValues(alpha: 0.5), // Blurry background
                   ),
                   child: Text(
                     'Light',
@@ -82,8 +82,8 @@ class ThemeSettingsPage extends StatelessWidget {
         // Dark Theme
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          width: _size,
-          height: _size,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color:
                 AppConfig.appTheme.value == ThemeMode.dark
@@ -106,8 +106,8 @@ class ThemeSettingsPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   'assets/dark_mode.png',
-                  width: _sizePic,
-                  height: _sizePic,
+                  width: sizePic,
+                  height: sizePic,
                 ),
               ),
 
@@ -121,7 +121,7 @@ class ThemeSettingsPage extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.black.withOpacity(0.5), // Blurry background
+                    color: Colors.black.withValues(alpha: 0.5), // Blurry background
                   ),
                   child: Text(
                     'Dark',
@@ -146,8 +146,8 @@ class ThemeSettingsPage extends StatelessWidget {
         // Auto Theme
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          width: _size,
-          height: _size,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color:
                 AppConfig.appTheme.value == ThemeMode.system
@@ -170,8 +170,8 @@ class ThemeSettingsPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
                   'assets/auto_mode.png',
-                  width: _sizePic,
-                  height: _sizePic,
+                  width: sizePic,
+                  height: sizePic,
                 ),
               ),
 
@@ -185,7 +185,7 @@ class ThemeSettingsPage extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.black.withOpacity(0.5), // Blurry background
+                    color: Colors.black.withValues(alpha: 0.5), // Blurry background
                   ),
                   child: Text(
                     'Auto',

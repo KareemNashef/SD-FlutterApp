@@ -1,21 +1,21 @@
 // Flutter imports
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
 import 'dart:async';
 
 // Local imports
 import 'package:fooocus/generate_base.dart';
-import 'package:fooocus/configs.dart';
+// import 'package:fooocus/configs.dart';
 
 class OutpaintImagePage extends GeneratorBase {
   const OutpaintImagePage({super.key});
 
   @override
-  _OutpaintImagePageState createState() => _OutpaintImagePageState();
+  OutpaintImagePageState createState() => OutpaintImagePageState();
 }
 
-class _OutpaintImagePageState extends GeneratorBaseState {
+class OutpaintImagePageState extends GeneratorBaseState {
   // ===== Class Variables =====
 
   // Outpaint variables
@@ -27,41 +27,41 @@ class _OutpaintImagePageState extends GeneratorBaseState {
   @override
   Future<void> generateImage(String prompt) async {
     // Check if an image is selected
-    if (inputImage == null) return;
+    // if (inputImage == null) return;
 
     // Check if outpaint selections are made
-    if (outpaintSelections.isEmpty) return;
+    // if (outpaintSelections.isEmpty) return;
 
     // URL for the image generation API
-    final url = Uri.parse(
-      'http://${AppConfig.ip}:${AppConfig.port}/v2/generation/image-inpaint-outpaint',
-    );
+    // final url = Uri.parse(
+    //   'http://${AppConfig.ip}:${AppConfig.port}/v2/generation/image-inpaint-outpaint',
+    // );
 
     // Headers for the request
-    final headers = {'Content-Type': 'application/json'};
+    // final headers = {'Content-Type': 'application/json'};
 
     // Convert the selected image to base64
-    final base64Image = base64Encode(await inputImage!.readAsBytes());
+    // final base64Image = base64Encode(await inputImage!.readAsBytes());
 
     // Body of the request
-    final body = jsonEncode({
-      "prompt": "",
-      "negative_prompt": AppConfig.negativePrompts,
-      "image_number": AppConfig.imageNumber,
-      "guidance_scale": AppConfig.guidanceScale,
-      "base_model_name": AppConfig.selectedModel,
-      "async_process": true,
-      "input_image": base64Image,
-      "outpaint_selections": outpaintSelections,
-    });
+    // final body = jsonEncode({
+    //   "prompt": "",
+    //   "negative_prompt": AppConfig.negativePrompts,
+    //   "image_number": AppConfig.imageNumber,
+    //   "guidance_scale": AppConfig.guidanceScale,
+    //   "base_model_name": AppConfig.selectedModel,
+    //   "async_process": true,
+    //   "input_image": base64Image,
+    //   "outpaint_selections": outpaintSelections,
+    // });
 
     // Send the request
-    setState(() => isGenerating = true);
-    final response = await http.post(url, headers: headers, body: body);
+    // setState(() => isGenerating = true);
+    // final response = await http.post(url, headers: headers, body: body);
 
     // Extract job ID from response
-    final data = jsonDecode(response.body);
-    String jobID = data['job_id'];
+    // final data = jsonDecode(response.body);
+    // String jobID = data['job_id'];
 
     // Start progress tracking
     //await followJobProgress(jobID);
@@ -193,7 +193,7 @@ class _OutpaintImagePageState extends GeneratorBaseState {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    downloadButton(),
+                    downloadButton(context),
                     replaceInputImageButton(),
                     resetButton(),
                   ],

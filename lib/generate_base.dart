@@ -73,44 +73,34 @@ class GeneratorBaseState extends State<GeneratorBase> {
         .then((generationResponse) async {
           // Handle the response when it becomes available
           if (generationResponse.statusCode == 200) {
-            try {
-              final generationData = jsonDecode(generationResponse.body);
-              final infoText = generationData['info'];
-              File logFile = File('/storage/emulated/0/Pictures/Fooocus/debug_output.txt');
-              await logFile.writeAsString(infoText, mode: FileMode.append);
-              List<String> base64Images = List<String>.from(
-                generationData['images'],
-              );
-
-              // Process the images
-              for (var base64Str in base64Images) {
-                final bytes = base64Decode(base64Str);
-                final tempDir = Directory.systemTemp;
-                final file = await File(
-                  '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.png',
-                ).writeAsBytes(bytes);
-                outputImages.add(file);
-              }
-
-              // Update UI after processing images
-              setState(() {
-                outputImageIndex = 0;
-                outputImage = outputImages[0];
-                isShowingInputImage = false;
-                isGenerating = false;
-              });
-            } catch (e) {
-              print('Error parsing response: $e');
-            }
-          } else {
-            print(
-              'Request failed with status: ${generationResponse.statusCode}.',
+            final generationData = jsonDecode(generationResponse.body);
+            final infoText = generationData['info'];
+            File logFile = File(
+              '/storage/emulated/0/Pictures/Fooocus/debug_output.txt',
             );
+            await logFile.writeAsString(infoText, mode: FileMode.append);
+            List<String> base64Images = List<String>.from(
+              generationData['images'],
+            );
+
+            // Process the images
+            for (var base64Str in base64Images) {
+              final bytes = base64Decode(base64Str);
+              final tempDir = Directory.systemTemp;
+              final file = await File(
+                '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.png',
+              ).writeAsBytes(bytes);
+              outputImages.add(file);
+            }
+
+            // Update UI after processing images
+            setState(() {
+              outputImageIndex = 0;
+              outputImage = outputImages[0];
+              isShowingInputImage = false;
+              isGenerating = false;
+            });
           }
-        })
-        .catchError((e) {
-          print('Error during HTTP request: $e');
-          // Handle errors
         });
 
     // Set the query URL for the job progress
@@ -200,7 +190,7 @@ class GeneratorBaseState extends State<GeneratorBase> {
   // ===== Helper Widgets =====
 
   // Download button widget
-  Widget downloadButton() {
+  Widget downloadButton(context) {
     return ElevatedButton(
       // Button style
       style: ElevatedButton.styleFrom(

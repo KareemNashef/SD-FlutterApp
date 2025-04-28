@@ -116,8 +116,8 @@ Future<void> fetchModels() async {
 
   // Save the models to the config
   AppConfig.modelTitles = (data as List).map((item) => item['title'] as String).toList();
-  AppConfig.modelNames = (data as List).map((item) => item['model_name'] as String).toList();
-  AppConfig.modelHashes = (data as List).map((item) => item['hash'] as String).toList();
+  AppConfig.modelNames = (data).map((item) => item['model_name'] as String).toList();
+  AppConfig.modelHashes = (data).map((item) => item['hash'] as String).toList();
 
   // Populate the model previews
   for (int i = 0; i < AppConfig.modelHashes.length; i++) {

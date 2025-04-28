@@ -4,18 +4,17 @@ import 'package:flutter/material.dart';
 // Local imports
 import 'package:fooocus/generate_text2img.dart';
 import 'package:fooocus/generate_inpaint.dart';
-import 'package:fooocus/generate_outpaint.dart';
 import 'package:fooocus/generate_img2img.dart';
 
 // Generate page main
 class GeneratePage extends StatefulWidget {
   const GeneratePage({super.key});
   @override
-  _GeneratePageState createState() => _GeneratePageState();
+  GeneratePageState createState() => GeneratePageState();
 }
 
 // State class for the generate page
-class _GeneratePageState extends State<GeneratePage> {
+class GeneratePageState extends State<GeneratePage> {
   // Class variables
   int _selectedOptionIndex = -1;
 
