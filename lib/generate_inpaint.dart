@@ -71,11 +71,13 @@ class InpaintImagePageState extends GeneratorBaseState {
       "scheduler": "karras",
 
       "mask_blur": 4, // Mask blur
-      "inpainting_fill": 3, // 0 - Fill, 1 - Original, 2 - Latent Noise, 3 - Latent Nothing
+      "inpainting_fill":
+          3, // 0 - Fill, 1 - Original, 2 - Latent Noise, 3 - Latent Nothing
       // "inpaint_full_res": true, // False - ???, True - Inpaint only masked
       "inpaint_full_res_padding": 32,
+      "inpaint_full_res": 1,
       "inpainting_mask_invert": 0, // 0 - Inpaint masked, 1 - Inpaint unmasked
-      "mask_round": false,
+      "mask_round": true,
 
       "resize_mode": 0,
       "image_cfg_scale": 1.5,
@@ -256,6 +258,31 @@ class InpaintImagePageState extends GeneratorBaseState {
     );
   }
 
+  // Replace input image button widget
+  Widget replaceInputImageButtonAndResetCanvas() {
+    return ElevatedButton.icon(
+      // Button style
+      style: ElevatedButton.styleFrom(
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.all(12),
+      ),
+
+      // Button action
+      onPressed: () {
+        replaceInputImage();
+        setState(() {
+          points.clear();
+        });
+      },
+
+      // Button icon
+      icon: const Icon(Icons.sync, color: Colors.white),
+
+      // Button label
+      label: const Text('Use as New Base'),
+    );
+  }
+
   //  ===== Build Method =====
 
   @override
@@ -281,7 +308,7 @@ class InpaintImagePageState extends GeneratorBaseState {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     downloadButton(context),
-                    replaceInputImageButton(),
+                    replaceInputImageButtonAndResetCanvas(),
                     resetButton(),
                   ],
                 ),
