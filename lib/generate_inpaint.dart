@@ -159,41 +159,42 @@ class InpaintImagePageState extends GeneratorBaseState {
 
   // Drawing tools widget
   Widget drawingTools() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Erase button
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(12),
-          ),
-          onPressed: () {
-            setState(() {
-              isErasing = !isErasing;
-            });
-          },
-          child: Icon(
-            isErasing ? Icons.brush : Icons.delete,
-            color: Colors.white,
-          ),
-        ),
-
-        // Stroke width slider
-        Expanded(
-          child: Slider(
-            value: strokeWidth,
-            min: 1.0,
-            max: 100.0,
-            divisions: 19,
-            onChanged: (value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Draw & Erase buttons
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: false, label: Icon(Icons.brush)),
+              ButtonSegment(value: true, label: Icon(Icons.delete)),
+            ],
+            selected: {isErasing},
+            showSelectedIcon: false,
+            onSelectionChanged: (values) {
               setState(() {
-                strokeWidth = value;
+                isErasing = values.first;
               });
             },
           ),
-        ),
-      ],
+
+          // Stroke width slider
+          Expanded(
+            child: Slider(
+              value: strokeWidth,
+              min: 1.0,
+              max: 100.0,
+              divisions: 19,
+              onChanged: (value) {
+                setState(() {
+                  strokeWidth = value;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -364,8 +365,9 @@ class MaskPainter extends CustomPainter {
         paint
           ..strokeWidth = p1.width
           ..isAntiAlias = false
-          ..color = p1.isErase ? Colors.transparent : Colors.white
-          ..blendMode = p1.isErase ? BlendMode.clear : BlendMode.srcOver;
+          ..color =
+              p1.isErase ? Colors.transparent : Colors.white.withOpacity(0.5)
+          ..blendMode = p1.isErase ? BlendMode.clear : BlendMode.src;
 
         // Draw the line between the two points
         canvas.drawLine(p1.offset, p2.offset, paint);

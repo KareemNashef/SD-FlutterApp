@@ -114,6 +114,8 @@ Future<void> fetchModels() async {
   // Parse the response body as JSON
   final data = jsonDecode(response.body);
 
+  print(data);
+
   // Save the models to the config
   AppConfig.modelTitles = (data as List).map((item) => item['title'] as String).toList();
   AppConfig.modelNames = (data).map((item) => item['model_name'] as String).toList();
